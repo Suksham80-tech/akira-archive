@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AKIRA // ARCHIVE — Local Offline Anime Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@700;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --crimson: #D92B2B;
+      --crimson-dark: #A81C1C;
+      --cream: #F6F2E9;
+      --cream-card: #EFE9DC;
+      --black: #121214;
+      --charcoal: #222226;
+      --muted: #5A5854;
+      --amber: #D9822B;
+      --border: 2.5px solid var(--black);
+      --shadow: 5px 5px 0px var(--black);
+      --shadow-sm: 3px 3px 0px var(--black);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--black);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(rgba(18, 18, 20, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    header {
+      background-color: var(--black);
+      color: var(--cream);
+      border-bottom: 4px solid var(--crimson);
+      padding: 1.25rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand { display: flex; align-items: center; gap: 0.85rem; }
+    .brand-stamp {
+      background-color: var(--crimson);
+      color: var(--cream);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 900;
+      padding: 0.35rem 0.6rem;
+      font-size: 1.25rem;
+      border: 2px solid var(--cream);
+      line-height: 1;
+    }
+    .brand-title h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+    .brand-title span {
+      font-size: 0.75rem;
+      color: #A09D96;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    .header-actions { display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0.6rem 1rem;
+      border: var(--border);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      background-color: var(--cream);
+      color: var(--black);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow); }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px var(--black); }
+    .btn-crimson { background-color: var(--crimson); color: var(--cream); }
+    .btn-crimson:hover { background-color: var(--crimson-dark); }
+    .btn-black {
+      background-color: var(--black);
+      color: var(--cream);
+      border-color: var(--cream);
+      box-shadow: 3px 3px 0px var(--crimson);
+    }
+
+    .container {
+      max-width: 1320px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 2.25rem;
+      align-items: start;
+    }
+    @media (max-width: 1024px) { .container { grid-template-columns: 1fr; } }
+
+    .deck-panel {
+      background-color: var(--cream-card);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: var(--border);
+      padding-bottom: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dot-crimson {
+      width: 10px;
+      height: 10px;
+      background-color: var(--crimson);
+      display: inline-block;
+      border: 1.5px solid var(--black);
+    }
+
+    .search-box { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .input-field {
+      flex: 1;
+      padding: 0.65rem 0.85rem;
+      border: var(--border);
+      background-color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--black);
+      outline: none;
+    }
+    .input-field:focus { background-color: #fff; box-shadow: var(--shadow-sm); }
+
+    .mode-bar { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .chip {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border: 1.5px solid var(--black);
+      background-color: var(--cream);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .chip.active, .chip:hover { background-color: var(--black); color: var(--cream); }
+
+    .anime-showcase {
+      background-color: var(--cream);
+      border: var(--border);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .cover-wrapper {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      border: var(--border);
+      overflow: hidden;
+      background-color: var(--black);
+      margin-bottom: 1rem;
+    }
+    .cover-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .score-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: var(--crimson);
+      color: var(--cream);
+      border: 2px solid var(--black);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .meta-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background-color: var(--black);
+      color: var(--cream);
+      border: 1.5px solid var(--cream);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      text-transform: uppercase;
+    }
+    .anime-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.2rem;
+    }
+    .anime-jp { font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-bottom: 0.5rem; }
+    .anime-synopsis { font-size: 0.82rem; line-height: 1.45; color: #333; max-height: 4.2em; overflow-y: auto; }
+
+    .triage-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .triage-grid { display: flex; flex-direction: column; gap: 0.55rem; }
+    .triage-btn { width: 100%; justify-content: space-between; text-align: left; padding: 0.75rem 1rem; font-size: 0.82rem; }
+    .triage-btn.watched { background-color: var(--crimson); color: var(--cream); }
+    .triage-btn.maybe { background-color: var(--cream); color: var(--black); border-left: 8px solid var(--amber); }
+    .triage-btn.rather-not { background-color: var(--charcoal); color: var(--cream); }
+    .triage-sub { font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 400; opacity: 0.85; }
+
+    .search-results-drawer {
+      background-color: var(--cream);
+      border: var(--border);
+      margin-bottom: 1rem;
+      max-height: 240px;
+      overflow-y: auto;
+      display: none;
+    }
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid rgba(18, 18, 20, 0.15);
+      cursor: pointer;
+    }
+    .search-result-item:hover { background-color: var(--crimson); color: var(--cream); }
+    .search-result-item img { width: 36px; height: 50px; object-fit: cover; border: 1px solid var(--black); }
+
+    .archive-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .stat-card { background-color: var(--cream-card); border: var(--border); box-shadow: var(--shadow-sm); padding: 1rem; }
+    .stat-card.highlight { background-color: var(--crimson); color: var(--cream); }
+    .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.2rem; }
+    .stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .tabs-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      border-bottom: var(--border);
+      padding-bottom: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .tab-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tab-btn {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      padding: 0.55rem 0.95rem;
+      border: var(--border);
+      background-color: var(--cream-card);
+      cursor: pointer;
+    }
+    .tab-btn.active { background-color: var(--crimson); color: var(--cream); box-shadow: var(--shadow-sm); transform: translate(-2px, -2px); }
+
+    .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.25rem; }
+    .record-card {
+      background-color: var(--cream-card);
+      border: var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .record-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow); }
+    .record-cover { position: relative; height: 260px; border-bottom: var(--border); background-color: var(--black); }
+    .record-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .category-ribbon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border: 1.5px solid var(--black);
+      box-shadow: 2px 2px 0px var(--black);
+    }
+    .ribbon-watched { background-color: var(--crimson); color: var(--cream); }
+    .ribbon-maybe { background-color: var(--amber); color: var(--black); }
+    .ribbon-rather_not { background-color: var(--charcoal); color: var(--cream); }
+
+    .record-body { padding: 0.85rem; display: flex; flex-direction: column; flex: 1; justify-content: space-between; gap: 0.65rem; }
+    .record-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.2rem; }
+    .record-meta { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+    .record-controls { display: flex; gap: 0.4rem; align-items: center; border-top: 1.5px solid rgba(18, 18, 20, 0.15); padding-top: 0.6rem; }
+    .category-select {
+      flex: 1;
+      padding: 0.3rem 0.4rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      border: 1.5px solid var(--black);
+      background-color: var(--cream);
+      cursor: pointer;
+    }
+    .delete-btn { background-color: var(--black); color: var(--cream); border: 1.5px solid var(--black); padding: 0.3rem 0.5rem; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
+    .delete-btn:hover { background-color: var(--crimson); }
+
+    .empty-state { grid-column: 1 / -1; background-color: var(--cream-card); border: var(--border); padding: 3rem 1.5rem; text-align: center; }
+    .empty-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; margin-bottom: 0.3rem; text-transform: uppercase; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: var(--black);
+      color: var(--cream);
+      border: 2px solid var(--crimson);
+      box-shadow: var(--shadow);
+      padding: 0.75rem 1.15rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transform: translateY(150%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+    }
+    .toast.show { transform: translateY(0); }
+  </style>
+  <!-- Link your external upgrade stylesheet -->
+  <link rel="stylesheet" href="akira-upgrade.css">
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-stamp">録</div>
+      <div class="brand-title">
+        <h1>AKIRA // ARCHIVE</h1>
+        <span>Local SQLite Offline Anime Vault</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-black" id="exportBtn">↓ Export JSON</button>
+      <button class="btn btn-black" id="importBtn">↑ Import JSON</button>
+      <input type="file" id="importFileInput" accept=".json" style="display: none;" />
+      <button class="btn btn-crimson" id="nextRandomBtn">↻ Surprise Me</button>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- LEFT PANEL: LOCAL SQLITE DISCOVERY & TRIAGE -->
+    <section class="deck-panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot-crimson"></span> Local Database Deck</div>
+        <span id="dbStatus" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--crimson);">SQLite Offline</span>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="searchInput" class="input-field" placeholder="Search 38,000+ local anime..." />
+        <button class="btn btn-crimson" id="searchBtn">Search</button>
+      </div>
+
+      <div class="search-results-drawer" id="searchResultsDrawer"></div>
+
+      <div class="mode-bar">
+        <button class="chip active" data-feed="top">★ Top Rated</button>
+        <button class="chip" data-feed="seasonal">🔥 2024+ Airing</button>
+        <button class="chip" data-feed="random">🎲 Random Vault</button>
+      </div>
+
+      <div class="anime-showcase">
+        <div class="cover-wrapper">
+          <img id="currentCover" src="" alt="Anime Cover" />
+          <div class="score-badge" id="currentScore">★ 0.00</div>
+          <div class="meta-badge" id="currentMeta">TV • 0 EPS</div>
+        </div>
+        <h2 class="anime-title" id="currentTitle">Loading Local Database...</h2>
+        <div class="anime-jp" id="currentJp">アニメーション</div>
+        <p class="anime-synopsis" id="currentSynopsis">Connecting to local SQLite database...</p>
+      </div>
+
+      <span class="triage-label">Record to Your Watchlist Vault:</span>
+      <div class="triage-grid">
+        <button class="btn triage-btn watched" data-category="watched">
+          <span>✓ Watched</span>
+          <span class="triage-sub">Completed & seen it</span>
+        </button>
+        <button class="btn triage-btn maybe" data-category="maybe">
+          <span>⏳ Maybe Later</span>
+          <span class="triage-sub">Interested — saving for later</span>
+        </button>
+        <button class="btn triage-btn rather-not" data-category="rather_not">
+          <span>✕ Rather Not, But Okay</span>
+          <span class="triage-sub">Not interested, keeping record</span>
+        </button>
+      </div>
+
+      <button class="btn" id="skipBtn" style="width: 100%; margin-top: 0.75rem;">Skip to Next Anime →</button>
+    </section>
+
+    <!-- RIGHT PANEL: WATCHLIST ARCHIVE -->
+    <section class="archive-panel">
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Total Recorded</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statWatched">0</div>
+          <div class="stat-label">✓ Watched</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statMaybe">0</div>
+          <div class="stat-label">⏳ Maybe Later</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statRatherNot">0</div>
+          <div class="stat-label">✕ Rather Not</div>
+        </div>
+      </div>
+
+      <div class="tabs-bar">
+        <div class="tab-group">
+          <button class="tab-btn active" data-filter="all">All Records</button>
+          <button class="tab-btn" data-filter="watched">Watched</button>
+          <button class="tab-btn" data-filter="maybe">Maybe Later</button>
+          <button class="tab-btn" data-filter="rather_not">Rather Not</button>
+        </div>
+        <input type="text" id="vaultFilterInput" class="input-field" placeholder="Filter saved vault..." style="max-width: 210px; padding: 0.5rem 0.75rem;" />
+      </div>
+
+      <div class="collection-grid" id="collectionGrid"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toastMsg">Saved to Watchlist!</div>
+
+  <script>
+    const STORAGE_KEY = "akira_archive_local_v1";
+    let watchlist = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let deckQueue = [];
+    let deckIndex = 0;
+    let currentAnime = null;
+    let activeFilter = "all";
+
+    const currentCover = document.getElementById("currentCover");
+    const currentScore = document.getElementById("currentScore");
+    const currentMeta = document.getElementById("currentMeta");
+    const currentTitle = document.getElementById("currentTitle");
+    const currentJp = document.getElementById("currentJp");
+    const currentSynopsis = document.getElementById("currentSynopsis");
+    const searchResultsDrawer = document.getElementById("searchResultsDrawer");
+    const collectionGrid = document.getElementById("collectionGrid");
+
+    async function fetchFeed(mode = "top") {
+      try {
+        const res = await fetch(`/api/feed?mode=${mode}`);
+        deckQueue = await res.json();
+        deckIndex = 0;
+        renderShowcase();
+      } catch (err) {
+        currentTitle.textContent = "Server Connection Error";
+        currentSynopsis.textContent = "Make sure server.py is running on http://localhost:8000";
+      }
+    }
+
+    async function searchAnime(query) {
+      if (!query.trim()) return;
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const items = await res.json();
+        searchResultsDrawer.innerHTML = "";
+        
+        if (items.length === 0) {
+          searchResultsDrawer.style.display = "block";
+          searchResultsDrawer.innerHTML = `<div style="padding: 0.75rem; font-size: 0.85rem;">No anime found matching "${query}".</div>`;
+          return;
+        }
+
+        items.forEach(anime => {
+          const row = document.createElement("div");
+          row.className = "search-result-item";
+          row.innerHTML = `
+            <img src="${anime.image}" alt="${anime.title}" />
+            <div>
+              <div style="font-weight: 700; font-size: 0.83rem;">${anime.title}</div>
+              <div style="font-size: 0.7rem; opacity: 0.8;">${anime.meta} • ★ ${anime.score}</div>
+            </div>
+          `;
+          row.addEventListener("click", () => {
+            currentAnime = anime;
+            renderShowcase(anime);
+            searchResultsDrawer.style.display = "none";
+          });
+          searchResultsDrawer.appendChild(row);
+        });
+        searchResultsDrawer.style.display = "block";
+      } catch (e) {
+        showToast("Search failed.");
+      }
+    }
+
+    function renderShowcase(override = null) {
+      if (override) {
+        currentAnime = override;
+      } else {
+        if (deckQueue.length === 0) return;
+        currentAnime = deckQueue[deckIndex % deckQueue.length];
+      }
+
+      currentCover.src = currentAnime.image;
+      currentScore.textContent = `★ ${currentAnime.score}`;
+      currentMeta.textContent = currentAnime.meta;
+      currentTitle.textContent = currentAnime.title;
+      currentJp.textContent = currentAnime.title_japanese;
+      currentSynopsis.textContent = currentAnime.synopsis;
+    }
+
+    function advanceDeck() {
+      deckIndex = (deckIndex + 1) % Math.max(deckQueue.length, 1);
+      renderShowcase();
+    }
+
+    function recordAnime(animeObj, category) {
+      if (!animeObj) return;
+      const existingIdx = watchlist.findIndex(item => item.mal_id === animeObj.mal_id);
+      const entry = { ...animeObj, category, updatedAt: new Date().toISOString() };
+
+      if (existingIdx > -1) {
+        watchlist[existingIdx] = entry;
+        showToast(`Updated "${animeObj.title}" → ${formatCat(category)}`);
+      } else {
+        watchlist.unshift(entry);
+        showToast(`Added "${animeObj.title}" → ${formatCat(category)}`);
+      }
+      saveAndRender();
+      advanceDeck();
+    }
+
+    function formatCat(cat) {
+      if (cat === "watched") return "Watched";
+      if (cat === "maybe") return "Maybe Later";
+      return "Rather Not";
+    }
+
+    function saveAndRender() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(watchlist));
+
+      document.getElementById("statTotal").textContent = watchlist.length;
+      document.getElementById("statWatched").textContent = watchlist.filter(a => a.category === "watched").length;
+      document.getElementById("statMaybe").textContent = watchlist.filter(a => a.category === "maybe").length;
+      document.getElementById("statRatherNot").textContent = watchlist.filter(a => a.category === "rather_not").length;
+
+      const keyword = document.getElementById("vaultFilterInput").value.toLowerCase();
+      const filtered = watchlist.filter(item => {
+        const matchesTab = activeFilter === "all" || item.category === activeFilter;
+        const matchesQuery = !keyword || item.title.toLowerCase().includes(keyword);
+        return matchesTab && matchesQuery;
+      });
+
+      collectionGrid.innerHTML = "";
+      if (filtered.length === 0) {
+        collectionGrid.innerHTML = `
+          <div class="empty-state">
+            <h3>No Records Found</h3>
+            <p style="font-size: 0.85rem; color: var(--muted);">Triage anime from the left panel to build your vault.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "record-card";
+        card.innerHTML = `
+          <div class="record-cover">
+            <img src="${item.image}" alt="${item.title}" loading="lazy" />
+            <span class="category-ribbon ribbon-${item.category}">${formatCat(item.category)}</span>
+          </div>
+          <div class="record-body">
+            <div>
+              <div class="record-title">${item.title}</div>
+              <div class="record-meta">${item.meta} • ★ ${item.score}</div>
+            </div>
+            <div class="record-controls">
+              <select class="category-select" data-id="${item.mal_id}">
+                <option value="watched" ${item.category === "watched" ? "selected" : ""}>✓ Watched</option>
+                <option value="maybe" ${item.category === "maybe" ? "selected" : ""}>⏳ Maybe Later</option>
+                <option value="rather_not" ${item.category === "rather_not" ? "selected" : ""}>✕ Rather Not</option>
+              </select>
+              <button class="delete-btn" data-delete="${item.mal_id}">✕</button>
+            </div>
+          </div>
+        `;
+
+        card.querySelector(".category-select").addEventListener("change", e => {
+          item.category = e.target.value;
+          saveAndRender();
+          showToast(`Moved "${item.title}"`);
+        });
+
+        card.querySelector(".delete-btn").addEventListener("click", () => {
+          watchlist = watchlist.filter(a => a.mal_id !== item.mal_id);
+          saveAndRender();
+          showToast(`Removed "${item.title}"`);
+        });
+
+        collectionGrid.appendChild(card);
+      });
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById("toastMsg");
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
+    }
+
+    // Listeners
+    document.querySelectorAll(".triage-btn").forEach(btn => {
+      btn.addEventListener("click", () => recordAnime(currentAnime, btn.dataset.category));
+    });
+    document.getElementById("skipBtn").addEventListener("click", advanceDeck);
+    document.getElementById("nextRandomBtn").addEventListener("click", () => fetchFeed("random"));
+    document.getElementById("searchBtn").addEventListener("click", () => searchAnime(document.getElementById("searchInput").value));
+    document.getElementById("searchInput").addEventListener("keydown", e => { if (e.key === "Enter") searchAnime(e.target.value); });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        fetchFeed(chip.dataset.feed);
+      });
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeFilter = tab.dataset.filter;
+        saveAndRender();
+      });
+    });
+
+    document.getElementById("vaultFilterInput").addEventListener("input", saveAndRender);
+
+    // Export / Import
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(watchlist, null, 2));
+      const dl = document.createElement("a");
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", `akira_archive_backup_${Date.now()}.json`);
+      document.body.appendChild(dl);
+      dl.click();
+      dl.remove();
+      showToast("Watchlist exported successfully!");
+    });
+
+    const importInput = document.getElementById("importFileInput");
+    document.getElementById("importBtn").addEventListener("click", () => importInput.click());
+    importInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const imported = JSON.parse(event.target.result);
+          if (Array.isArray(imported)) {
+            watchlist = imported;
+            saveAndRender();
+            showToast(`Imported ${watchlist.length} records!`);
+          }
+        } catch (err) {
+          showToast("Invalid JSON backup file.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    saveAndRender();
+    fetchFeed("top");
+  </script>
+  <script src="akira-upgrade.js"></script>
+</body>
+</html>
