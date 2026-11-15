@@ -18,3 +18,18 @@
 1. Clone or download this repository.
 2. Open `index.html` using a local server (such as **VS Code Live Server** or `python -m http.server`) so the browser can load the local JSON dataset cleanly.
 3. Search across 38,000+ titles and start building your archive.
+
+Follow these initial setup steps to build the local database and launch the application:
+
+1. **Build the Local Database:**
+   Run the database builder script to automatically download the 38,000+ anime dataset and generate your local `anime.db` file:
+   ```bash
+   python build_db.py
+2. **Start the local server:**
+   Launch the local Python server to host the application with zero rate limits:
+   ```bash
+   python server.py
+3. **Open the Application:**
+   Open your browser and navigate to:
+   ```bash
+   http://localhost:8000
